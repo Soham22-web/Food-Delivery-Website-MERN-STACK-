@@ -1,0 +1,87 @@
+.order-item {
+  display: grid;
+  grid-template-columns: 0.5fr 2fr 1fr 1fr auto;
+  align-items: start;
+  gap: 30px;
+  border: 1px solid tomato;
+  padding: 20px;
+  margin: 30px 30px;
+  font-size: 14px;
+  color: #505050;
+}
+
+/* Food & Name */
+.order-item-food,
+.order-item-name {
+  font-weight: 600;
+}
+
+/* Address */
+.order-item-address p {
+  margin: 0;
+}
+
+/* Phone */
+.order-item-phone {
+  margin-top: 10px;
+}
+
+/* ITEMS COUNT */
+.order-items-count {
+  font-weight: 400;
+  color: #444;
+}
+
+.order-items-value {
+  color: tomato;
+  font-weight: 600;
+}
+
+/* BOTTOM ROW → Evenly spaced with gaps */
+.order-amount-status {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* align items to start */
+  gap: 40px; /* space between Total Amount, Status, and Dropdown */
+  width: 100%;
+  white-space: nowrap;
+}
+
+/* Total Amount */
+.order-amount {
+  font-weight: 400;
+  color: #444;
+  min-width: 250px; /* ensures consistent spacing */
+}
+
+.order-amount-value {
+  color: tomato;
+  font-weight: 600;
+}
+
+/* Status label text */
+.order-status-label {
+  font-weight: 400;
+  color: #444;
+  min-width: 250px; /* gives breathing room */
+}
+
+.order-status-value {
+  color: tomato;
+  font-weight: 400;
+}
+
+/* Dropdown */
+.track-order-btn {
+  background-color: #ffe8e4;
+  border: 1px solid tomato;
+  width: max(10vw, 130px);
+  padding: 10px;
+  outline: none;
+  margin-left: auto; /* push dropdown to the far right */
+}
+
+/* Clean text spacing */
+.order-amount-status p {
+  margin: 0;
+}

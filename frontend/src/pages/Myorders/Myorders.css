@@ -1,0 +1,98 @@
+.my-orders {
+  padding: 20px;
+}
+
+.my-orders h2 {
+  margin-bottom: 20px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Each order box */
+.my-orders-order {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid tomato;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+
+  flex-wrap: nowrap;
+  gap: 120px;
+}
+
+/* Parcel icon */
+.my-orders-order img {
+  width: 50px;
+  height: 50px;
+}
+
+/* Items list */
+.order-items {
+  display: flex;
+  flex-wrap: wrap;       /* 🔥 allow wrapping */
+  gap: 10px;
+  margin: 0;
+
+  flex-shrink: 0;
+  max-width: 350px;      /* keeps layout nice */
+
+  margin-left: -80px;
+}
+
+/* Each item — 5 per row */
+.order-item-name {
+  font-weight: 500;
+  
+  /* 🔥 EXACT: 5 items per row */
+  flex: 0 0 calc(20% - 10px);
+  white-space: nowrap;
+}
+
+/* Values in tomato color */
+.value {
+  color: tomato;
+  font-weight: 600;
+}
+
+/* Status sticks to the right */
+.order-status {
+  margin-left: auto;
+}
+
+/* Status dot */
+.order-status .value::before {
+  content: '● ';
+  margin-right: 3px;
+}
+
+/* Button styling */
+.my-orders-order button {
+  padding: 5px 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.my-orders-order button:hover {
+  background-color: #45a049;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .my-orders-order {
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .order-status {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
