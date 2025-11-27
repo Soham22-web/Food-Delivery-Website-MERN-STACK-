@@ -8,3 +8,6 @@ admin/node_modules/
 
 # Ignore uploads
 Backend/uploads/
+
+# Backend environment
+Backend/.env
