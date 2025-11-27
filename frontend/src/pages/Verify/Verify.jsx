@@ -6,29 +6,34 @@ import { StoreContext } from '../../Context/StoreContext';
 
 const Verify = () => {
   const [searchParams] = useSearchParams();
-  const orderId = searchParams.get("orderId");
-  const session_id = searchParams.get("session_id");
-
   const navigate = useNavigate();
   const { url, token } = useContext(StoreContext);
 
-  const verifyPayment = async () => {
-    try {
-      await axios.post(url + "/api/order/verify", {
-        orderId,
-        session_id
-      }, { headers: { token } });
-
-      navigate("/myorders"); // always go to orders
-    } catch (error) {
-      console.log("Verify Error:", error);
-      navigate("/myorders"); // even on error
-    }
-  };
-
   useEffect(() => {
-    if (session_id && orderId) verifyPayment();
-  }, [session_id, orderId]);
+    const orderId = searchParams.get("orderId");
+
+    const markPaymentTrue = async () => {
+      try {
+        // Call backend to mark payment true (demo hack)
+        await axios.post(
+          url + "/api/order/verify",
+          { orderId },
+          { headers: { token } }
+        );
+      } catch (error) {
+        console.log("Verify Error:", error);
+      } finally {
+        // After backend update, go to MyOrders
+        navigate("/myorders");
+      }
+    };
+
+    if (orderId && token) {
+      markPaymentTrue();
+    } else {
+      navigate("/myorders"); // fallback
+    }
+  }, [searchParams, token, url, navigate]);
 
   return (
     <div className='verify'>

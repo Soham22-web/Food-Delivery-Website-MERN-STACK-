@@ -3,11 +3,12 @@ import userModel from "../models/userModel.js";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const CLIENT_URL = process.env.CLIENT_URL;
 
+// =====================================================
 // PLACE ORDER
+// =====================================================
 const placeOrder = async (req, res) => {
-    const frontend_url = "http://localhost:5173";
-
     try {
         const newOrder = new orderModel({
             userId: req.user.id,
@@ -41,100 +42,92 @@ const placeOrder = async (req, res) => {
             payment_method_types: ["card"],
             line_items,
             mode: "payment",
-            success_url: `${frontend_url}/verify?orderId=${newOrder._id}&session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${frontend_url}/verify?orderId=${newOrder._id}`,
+            success_url: `${CLIENT_URL}/verify?orderId=${newOrder._id}`,
+            cancel_url: `${CLIENT_URL}/verify?orderId=${newOrder._id}&success=false`,
         });
 
-        res.json({ success: true, session_url: session.url });
+        // Save session_id (optional, Stripe not used in demo)
+        await orderModel.findByIdAndUpdate(newOrder._id, {
+            session_id: session.id
+        });
+
+        return res.json({ success: true, session_url: session.url });
+
     } catch (error) {
         console.log("Error placing order:", error);
-        res.json({ success: false, message: "Error placing order" });
+        return res.json({ success: false, message: "Error placing order" });
     }
 };
 
-// VERIFY ORDER
+// =====================================================
+// VERIFY ORDER (DEMO HACK: payment true immediately)
+// =====================================================
 const verifyOrder = async (req, res) => {
-    const { orderId, session_id } = req.body;
-
     try {
-        const session = await stripe.checkout.sessions.retrieve(session_id);
+        const { orderId } = req.body || req.query;
 
-        if (session.payment_status === "paid") {
-            const updatedOrder = await orderModel.findByIdAndUpdate(
-                orderId,
-                { payment: true, status: "Paid" },
-                { new: true }
-            );
+        if (!orderId) return res.json({ success: false });
 
-            const orderToSave = {
-                orderId: updatedOrder._id,
-                items: updatedOrder.items,
-                amount: updatedOrder.amount,
-                address: updatedOrder.address,
-                payment: updatedOrder.payment,
-                status: updatedOrder.status,
-                date: updatedOrder.date,
-            };
+        // DEMO: mark payment true instantly
+        await orderModel.findByIdAndUpdate(
+            orderId,
+            { payment: true, status: "Paid" },
+            { new: true }
+        );
 
-            await userModel.findByIdAndUpdate(
-                updatedOrder.userId,
-                { $push: { cartData: orderToSave } }
-            );
-
-            return res.json({ success: true, order: updatedOrder });
-        }
-
-        return res.json({ success: false, message: "Payment not completed" });
+        return res.json({ success: true });
     } catch (error) {
-        console.log("Error verifying order:", error);
-        res.json({ success: false, message: "Error verifying order" });
+        console.log("VERIFY ERROR:", error);
+        return res.json({ success: false });
     }
 };
 
+// =====================================================
 // GET USER ORDERS
+// =====================================================
 const userOrders = async (req, res) => {
     try {
-        const orders = await orderModel.find({ userId: req.user.id }).sort({ date: -1 });
-        res.json({ success: true, data: orders });
+        const orders = await orderModel
+            .find({ userId: req.user.id })
+            .sort({ date: -1 });
+        return res.json({ success: true, data: orders });
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Error fetching orders" });
+        return res.json({ success: false, message: "Error fetching orders" });
     }
 };
 
-// =============================
+// =====================================================
 // ADMIN: GET ALL ORDERS
-// =============================
+// =====================================================
 const listAllOrders = async (req, res) => {
     try {
         const orders = await orderModel.find().sort({ date: -1 });
-        res.json({ success: true, data: orders });
+        return res.json({ success: true, data: orders });
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Error fetching all orders" });
+        return res.json({ success: false, message: "Error fetching all orders" });
     }
 };
 
-// =============================
+// =====================================================
 // ADMIN: UPDATE ORDER STATUS
-// =============================
+// =====================================================
 const updateOrderStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
-
         await orderModel.findByIdAndUpdate(orderId, { status });
-
-        res.json({ success: true, message: "Order status updated" });
+        return res.json({ success: true, message: "Order status updated" });
     } catch (error) {
         console.log(error);
-        res.json({ success: false, message: "Error updating status" });
+        return res.json({ success: false, message: "Error updating status" });
     }
 };
 
-export { 
-    placeOrder, 
-    verifyOrder, 
-    userOrders, 
-    listAllOrders, 
-    updateOrderStatus 
+export {
+    placeOrder,
+    verifyOrder,
+    userOrders,
+    listAllOrders,
+    updateOrderStatus
 };
